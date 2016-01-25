@@ -11,6 +11,8 @@
 *.userprefs
 
 # Build results
+[Xx]Net
+[Tt]est/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
