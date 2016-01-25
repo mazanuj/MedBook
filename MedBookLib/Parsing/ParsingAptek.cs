@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -40,7 +41,8 @@ namespace MedBookLib.Parsing
                                     Regex.Matches(z.InnerText, @"(?=Телефон:).+?(?=\s{2,}?\r?\n?(Заказать)?)")
                                         .AsEnumerable()
                                         .First(x => !x.Value.Contains("XX")).Value;
-                                var street = $"Адрес: {Regex.Match(z.InnerText, @"(?<=description: \').+?(?=\')").Value}";
+                                var street =
+                                    $"Адрес: {Regex.Match(z.InnerText, @"(?<=description: \').+?(?=\')").Value}";
                                 address = $"{tel}\r\n{street}";
                             }
                             catch (Exception)
@@ -67,14 +69,17 @@ namespace MedBookLib.Parsing
 
                             foreach (var h in drugs)
                             {
-                                var price =
+                                var priceStr =
                                     h.Descendants("div").First(x => x.Attributes["class"].Value == "value").InnerText;
-                                price = Regex.Match(price, @"\d+\.\d+").Value + " грн.";
+                                priceStr = Regex.Match(priceStr, @"\d+\.\d+").Value;
+                                var price = double.Parse(priceStr, new CultureInfo("En-us"));
 
                                 var drugName =
                                     h.Descendants("span")
                                         .First(
-                                            x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "caption")
+                                            x =>
+                                                x.Attributes.Contains("class") &&
+                                                x.Attributes["class"].Value == "caption")
                                         .InnerText;
                                 drugName = Regex.Match(drugName, @"(?=[^\r\n\s]).+(?<=[^\s])").Value;
 
